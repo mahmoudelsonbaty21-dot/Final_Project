@@ -18,6 +18,7 @@
 
     {{-- Add Review --}}
     <div class="card mb-4">
+
         <div class="card-header">
             <h2 class="mb-0">Add Review</h2>
         </div>
@@ -25,29 +26,56 @@
         <div class="card-body">
 
             <form action="{{ route('reviews.store') }}" method="POST">
+
                 @csrf
 
-                {{-- Product ID automatically --}}
+                {{-- Product ID --}}
                 <input
                     type="hidden"
                     name="prodact_id"
                     value="{{ $prodact->id }}"
                 >
 
+                {{-- Rating --}}
                 <div class="mb-3">
-                    <label class="form-label">Rating:</label>
 
-                    <select name="rating" class="form-select" required>
-                        <option value="1">⭐</option>
-                        <option value="2">⭐⭐</option>
-                        <option value="3">⭐⭐⭐</option>
-                        <option value="4">⭐⭐⭐⭐</option>
-                        <option value="5">⭐⭐⭐⭐⭐</option>
-                    </select>
+                    <label class="form-label">
+                        Rating:
+                    </label>
+
+                    <input
+                        type="hidden"
+                        name="rating"
+                        id="rating"
+                        value="0"
+                        required
+                    >
+
+                    <div
+                        id="starRating"
+                        style="font-size: 35px; cursor: pointer;"
+                    >
+
+                        <span data-value="1">☆</span>
+                        <span data-value="2">☆</span>
+                        <span data-value="3">☆</span>
+                        <span data-value="4">☆</span>
+                        <span data-value="5">☆</span>
+
+                    </div>
+
+                    <small id="ratingText" class="text-muted">
+                        Click a star
+                    </small>
+
                 </div>
 
+                {{-- Comment --}}
                 <div class="mb-3">
-                    <label class="form-label">Comment:</label>
+
+                    <label class="form-label">
+                        Comment:
+                    </label>
 
                     <textarea
                         name="comment"
@@ -55,20 +83,27 @@
                         rows="4"
                         required
                     ></textarea>
+
                 </div>
 
-                <button type="submit" class="btn btn-primary">
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
                     Add Review
                 </button>
 
             </form>
 
         </div>
+
     </div>
 
 
     {{-- Show Reviews --}}
-    <h2 class="mb-3">Reviews</h2>
+    <h2 class="mb-3">
+        Reviews
+    </h2>
 
     @if($reviews->count() > 0)
 
@@ -78,21 +113,39 @@
 
                 <div class="card-body">
 
+                    {{-- User --}}
                     <p>
                         <strong>User:</strong>
+
                         {{ $review->user->name ?? 'User' }}
                     </p>
 
+                    {{-- Rating --}}
                     <p>
                         <strong>Rating:</strong>
-                        {{ $review->rating }} ⭐
+
+                        @for($i = 1; $i <= 5; $i++)
+
+                            @if($i <= $review->rating)
+                                ⭐
+                            @else
+                                ☆
+                            @endif
+
+                        @endfor
+
+                        ({{ $review->rating }}/5)
                     </p>
 
+                    {{-- Comment --}}
                     <p>
                         <strong>Comment:</strong>
+
                         {{ $review->comment }}
                     </p>
 
+
+                    {{-- Edit & Delete only for owner --}}
                     @if($review->user_id == auth()->id())
 
                         <a
@@ -107,6 +160,7 @@
                             method="POST"
                             class="d-inline"
                         >
+
                             @csrf
                             @method('DELETE')
 
@@ -116,6 +170,7 @@
                             >
                                 Delete
                             </button>
+
                         </form>
 
                     @endif
@@ -135,5 +190,49 @@
     @endif
 
 </div>
+
+
+{{-- Star Rating JavaScript --}}
+<script>
+
+    const stars = document.querySelectorAll('#starRating span');
+
+    const rating = document.getElementById('rating');
+
+    const ratingText = document.getElementById('ratingText');
+
+
+    stars.forEach(star => {
+
+        star.addEventListener('click', function () {
+
+            const value = this.dataset.value;
+
+            // Save rating
+            rating.value = value;
+
+            // Change stars
+            stars.forEach(s => {
+
+                if (Number(s.dataset.value) <= Number(value)) {
+
+                    s.textContent = '⭐';
+
+                } else {
+
+                    s.textContent = '☆';
+
+                }
+
+            });
+
+            // Show rating number
+            ratingText.textContent = value + ' / 5';
+
+        });
+
+    });
+
+</script>
 
 @endsection
