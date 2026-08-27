@@ -7,6 +7,7 @@
 <div class="container mt-5">
 
     <div class="row justify-content-center">
+
         <div class="col-md-8">
 
             <div class="card">
@@ -17,61 +18,72 @@
 
                 <div class="card-body">
 
-                    <form action="{{ route('reviews.update', $review->id) }}" method="POST">
+                    <form
+                        action="{{ route('reviews.update', $review->id) }}"
+                        method="POST"
+                    >
 
                         @csrf
                         @method('PUT')
 
+
+                        {{-- Rating --}}
                         <div class="mb-3">
+
                             <label class="form-label">
-                                Rating
+                                Rating:
                             </label>
 
-                            <select name="rating" class="form-select" required>
+                            <input
+                                type="hidden"
+                                name="rating"
+                                id="rating"
+                                value="{{ $review->rating }}"
+                                required
+                            >
 
-                                <option value="1"
-                                    {{ $review->rating == 1 ? 'selected' : '' }}>
-                                    ⭐
-                                </option>
+                            <div
+                                id="starRating"
+                                style="font-size: 35px; cursor: pointer;"
+                            >
 
-                                <option value="2"
-                                    {{ $review->rating == 2 ? 'selected' : '' }}>
-                                    ⭐⭐
-                                </option>
+                                <span data-value="1">☆</span>
+                                <span data-value="2">☆</span>
+                                <span data-value="3">☆</span>
+                                <span data-value="4">☆</span>
+                                <span data-value="5">☆</span>
 
-                                <option value="3"
-                                    {{ $review->rating == 3 ? 'selected' : '' }}>
-                                    ⭐⭐⭐
-                                </option>
+                            </div>
 
-                                <option value="4"
-                                    {{ $review->rating == 4 ? 'selected' : '' }}>
-                                    ⭐⭐⭐⭐
-                                </option>
+                            <small id="ratingText" class="text-muted">
+                                {{ $review->rating }} / 5
+                            </small>
 
-                                <option value="5"
-                                    {{ $review->rating == 5 ? 'selected' : '' }}>
-                                    ⭐⭐⭐⭐⭐
-                                </option>
-
-                            </select>
                         </div>
 
 
+                        {{-- Comment --}}
                         <div class="mb-3">
+
                             <label class="form-label">
-                                Comment
+                                Comment:
                             </label>
 
                             <textarea
                                 name="comment"
                                 class="form-control"
                                 rows="5"
-                                required>{{ $review->comment }}</textarea>
+                                required
+                            >{{ $review->comment }}</textarea>
+
                         </div>
 
 
-                        <button type="submit" class="btn btn-primary">
+                        {{-- Buttons --}}
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
                             Update Review
                         </button>
 
@@ -89,8 +101,61 @@
             </div>
 
         </div>
+
     </div>
 
 </div>
+
+
+{{-- Star Rating JavaScript --}}
+<script>
+
+    const stars = document.querySelectorAll('#starRating span');
+
+    const rating = document.getElementById('rating');
+
+    const ratingText = document.getElementById('ratingText');
+
+
+    function showStars(value) {
+
+        stars.forEach(star => {
+
+            if (Number(star.dataset.value) <= Number(value)) {
+
+                star.textContent = '⭐';
+
+            } else {
+
+                star.textContent = '☆';
+
+            }
+
+        });
+
+        ratingText.textContent = value + ' / 5';
+    }
+
+
+    // Show the current rating when page opens
+    showStars(rating.value);
+
+
+    // Change rating when clicking a star
+    stars.forEach(star => {
+
+        star.addEventListener('click', function () {
+
+            const value = this.dataset.value;
+
+            rating.value = value;
+
+            showStars(value);
+
+        });
+
+    });
+
+</script>
 
 @endsection
