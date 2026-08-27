@@ -234,6 +234,7 @@
 
                     <div class="pv-card-actions">
                         <a href="{{ route('products.show', $product->id) }}" class="pv-link">View</a>
+                        <a href="{{ route('reviews.index', $product->id) }}" class="pv-link">Reviews</a>
 
                         @auth
                             @if(auth()->user()->isAdmin())
@@ -244,6 +245,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" onclick="return confirm('Delete this product?')">Delete</button>
+                                    
                                 </form>
                             @endif
 
