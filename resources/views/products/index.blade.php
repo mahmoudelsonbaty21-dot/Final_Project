@@ -205,6 +205,7 @@
         @auth
             @if(auth()->user()->isAdmin())
                 <a href="{{ route('products.create') }}" class="pv-add-btn">+ Add Product</a>
+                <a href="{{ route('reviews.index', $product->id) }}" class="pv-link">Reviews</a>
             @endif
         @endauth
     </div>
